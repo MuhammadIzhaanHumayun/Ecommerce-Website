@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client/extension";
+import { PrismaClient } from "../../../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import bcrypt from "bcrypt";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 export async function POST(request) {
   try {
     const { fullName, email, password, gender } = await request.json();
@@ -21,7 +25,7 @@ export async function POST(request) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 25);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
         fullName,
@@ -41,4 +45,8 @@ export async function POST(request) {
       { status: 500 },
     );
   }
+}
+
+export function GET() {
+  return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 }

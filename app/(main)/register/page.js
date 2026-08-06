@@ -1,8 +1,11 @@
 "use client";
+import Link from "next/link";
+
 const Register = () => {
   const handleRegister = async (e) => {
+    e.preventDefault();
     const data = new FormData(e.target);
-    const fullname = data.get("fullName");
+    const fullName = data.get("fullName");
     const email = data.get("email");
     const password = data.get("password");
     const confirmPassword = data.get("confirmPassword");
@@ -12,23 +15,23 @@ const Register = () => {
         return alert("Password doesn't match");
       }
 
-      //   const response = await fetch("/api/register", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({ fullName, email, password, gender }),
-      //   });
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fullName, email, password, gender }),
+      });
 
-      //   const result = await response.json();
+      const result = await response.json();
 
-      //   if (!response.ok) {
-      //     alert(result.error || "register failed");
-      //     return;
-      //   }
+      if (!response.ok) {
+        alert(result.error || "register failed");
+        return;
+      }
 
-      //   // register successful
-      //   alert("registration successful!");
+      // register successful
+      alert("registration successful!");
     } catch (error) {
       console.error("An error occurred:", error);
       alert("Something went wrong");
@@ -36,13 +39,13 @@ const Register = () => {
   };
 
   return (
-    <div className="container h-screen content-center justify-items-center bg-violet-950">
-      <div className="w-auto h-auto">
+    <div className="container h-screen w-auto content-center justify-items-center bg-violet-950">
+      <div>
         <form
           onSubmit={handleRegister}
-          className=" [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:rounded [&_label]:font-bold   flex flex-col bg-violet-500 px-10 py-8 rounded-2xl"
+          className=" [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:rounded [&_label]:font-bold   flex flex-col bg-violet-500 px-10 py-8 rounded-2xl w-[30vw]"
         >
-          <h1 className="text-center text-3xl pb-8 font-bold text-white">
+          <h1 className="text-center text-3xl pb-5 font-bold text-white">
             Register
           </h1>
           <label htmlFor="fullname">Full Name</label>
@@ -57,10 +60,16 @@ const Register = () => {
           <input type="text" name="gender" required />
           <button
             type="submit"
-            className="rounded-2xl bg-violet-700 py-1 text-white hover:cursor-pointer hover:bg-violet-900"
+            className="rounded-2xl bg-violet-700 py-1 text-white hover:cursor-pointer hover:bg-violet-900 mb-3"
           >
             Submit
           </button>
+          <p>
+            already have an account.{" "}
+            <Link href="/login" className="text-amber-400">
+              Login
+            </Link>
+          </p>
         </form>
       </div>
     </div>
