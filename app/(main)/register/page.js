@@ -39,7 +39,7 @@ const Register = () => {
   };
 
   return (
-    <div className="container h-screen w-auto content-center justify-items-center bg-violet-950">
+    <div className="container h-screen w-auto content-center justify-items-center bg-white">
       <div>
         <form
           onSubmit={handleRegister}
@@ -60,13 +60,13 @@ const Register = () => {
           <input type="text" name="gender" required />
           <button
             type="submit"
-            className="rounded-2xl bg-violet-700 py-1 text-white hover:cursor-pointer hover:bg-violet-900 mb-3"
+            className="rounded-2xl bg-fuchsia-600 py-1 text-white duration-200 hover:cursor-pointer hover:bg-fuchsia-500 mb-3"
           >
             Submit
           </button>
           <p>
             already have an account.{" "}
-            <Link href="/login" className="text-amber-400">
+            <Link href="/login" className="text-fuchsia-400 underline">
               Login
             </Link>
           </p>

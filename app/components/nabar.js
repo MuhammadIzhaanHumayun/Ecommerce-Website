@@ -10,12 +10,12 @@ export default async function Navbar() {
   const session = token ? await decrypt(token) : null;
 
   return (
-    <div className="flex w-auto justify-between px-5 py-6 bg-violet-600">
+    <div className="flex w-auto  items-center justify-between p-5 bg-violet-600">
       <Link href="/" className="text-2xl font-bold text-white">
         BAZAAR
       </Link>{" "}
       <nav>
-        <ul className="flex [&_li]:mx-2 [&_li]:text-white">
+        <ul className="items-center flex [&_li]:mx-2 [&_li]:text-white">
           <li>
             <input
               className="outline-none border-2 border-amber-100 rounded-2xl focus:border-black px-3"
@@ -41,16 +41,16 @@ export default async function Navbar() {
               <form action={logout}>
                 <button
                   type="submit"
-                  className="hover:underline hover:cursor-pointer"
+                  className="bg-fuchsia-600 text-white rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-fuchsia-500 hover:cursor-pointer"
                 >
-                  {session.role === "ADMIN" ? "Admin" : "Logout"}
+                  Logout
                 </button>
               </form>
             ) : (
-              <>
+              <button className="bg-fuchsia-600 text-white rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-fuchsia-500 hover:cursor-pointer">
                 <Link href="/login">Login</Link> /{" "}
                 <Link href="/register">Register</Link>
-              </>
+              </button>
             )}
           </li>
         </ul>

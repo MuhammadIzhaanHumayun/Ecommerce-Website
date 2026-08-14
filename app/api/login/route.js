@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/jwt";
-import { PrismaClient } from "../../../src/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 import bcrypt from "bcrypt";
+import Prisma from "@/lib/prisma";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new Prisma();
 
 export async function POST(request) {
   try {
