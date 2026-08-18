@@ -4612,16 +4612,16 @@ export namespace Prisma {
 
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    name?: string
     AND?: ProductWhereInput | ProductWhereInput[]
     OR?: ProductWhereInput[]
     NOT?: ProductWhereInput | ProductWhereInput[]
-    name?: StringFilter<"Product"> | string
     image?: StringFilter<"Product"> | string
     description?: StringFilter<"Product"> | string
     price?: FloatFilter<"Product"> | number
     categoryId?: IntFilter<"Product"> | number
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
-  }, "id">
+  }, "id" | "name">
 
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder

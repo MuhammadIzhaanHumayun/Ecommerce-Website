@@ -7,7 +7,7 @@ export const ourFileRouter = {
   productImage: f({
     image: { maxFileSize: "4MB", maxFileCount: 1 },
   }).onUploadComplete(async ({ file }) => {
-    console.log("File uploaded to:", file.url);
-    return { url: file.url };
+    console.log("File uploaded to:", file.ufsUrl);
+    return { url: file.ufsUrl };
   }),
 };
