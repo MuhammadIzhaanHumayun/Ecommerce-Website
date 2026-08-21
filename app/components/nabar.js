@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
+
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/jwt";
 import logout from "@/app/components/logout.js";
@@ -10,21 +12,16 @@ export default async function Navbar() {
   const session = token ? await decrypt(token) : null;
 
   return (
-    <div className="flex w-auto  items-center justify-between p-5 bg-violet-600">
+    <div className="flex w-auto  items-center justify-between p-5 bg-transparent ">
       <Link href="/" className="text-2xl font-bold text-white">
-        BAZAAR
+        Food<span className="text-btn-bg">ies.</span>
       </Link>{" "}
       <nav>
         <ul className="items-center flex [&_li]:mx-2 [&_li]:text-white">
-          <li>
-            <input
-              className="outline-none border-2 border-amber-100 rounded-2xl focus:border-black px-3"
-              type="search"
-              name="search"
-              id="search"
-            />
-          </li>
           <li>Contact Us</li>
+          <li>
+            <ShoppingCart />
+          </li>
           {session ? (
             <>
               {session.role === "ADMIN" ? (
@@ -41,13 +38,13 @@ export default async function Navbar() {
               <form action={logout}>
                 <button
                   type="submit"
-                  className="bg-fuchsia-600 text-white rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-fuchsia-500 hover:cursor-pointer"
+                  className="bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer"
                 >
                   Logout
                 </button>
               </form>
             ) : (
-              <button className="bg-fuchsia-600 text-white rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-fuchsia-500 hover:cursor-pointer">
+              <button className="bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer">
                 <Link href="/login">Login</Link> /{" "}
                 <Link href="/register">Register</Link>
               </button>

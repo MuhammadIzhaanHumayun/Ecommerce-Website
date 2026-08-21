@@ -46,9 +46,14 @@ export default function Login() {
             Login
           </h1>
           <label htmlFor="email">Email</label>
-          <input type="email" name="email" required />
+          <input type="email" autoComplete="username" name="email" required />
           <label htmlFor="password">Password</label>
-          <input type="password" name="password" required />
+          <input
+            type="password"
+            autoComplete="current-password"
+            name="password"
+            required
+          />
           <button
             type="submit"
             className="rounded-2xl bg-fuchsia-600 py-1 text-white duration-200 ease-in-out hover:cursor-pointer hover:bg-fuchsia-500 mb-3"

@@ -52,7 +52,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <main className="flex-1 p-6 overflow-auto">
+      <main className="flex-1 p-6 overflow-auto scrollbar-none">
         <div className="border border-gray-300 p-4 rounded bg-white min-h-full">
           {currentTab === "dashboard" && <DashboardView />}
           {currentTab === "orders" && <OrdersView />}

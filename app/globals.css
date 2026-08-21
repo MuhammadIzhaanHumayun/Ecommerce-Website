@@ -1,1 +1,9 @@
 @import "tailwindcss";
+body {
+  background-color: rgb(24, 24, 24);
+  color: white;
+}
+@theme {
+  --color-btn-bg: rgb(229, 181, 9);
+  --color-btn-text: rgb(255, 255, 255);
+}
