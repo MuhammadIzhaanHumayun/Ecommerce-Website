@@ -1,9 +1,12 @@
 @import "tailwindcss";
 body {
-  background-color: rgb(24, 24, 24);
-  color: white;
+  background-color: var(--color-body);
+  color: black;
 }
 @theme {
+  --color-body: rgb(24, 24, 24);
   --color-btn-bg: rgb(229, 181, 9);
   --color-btn-text: rgb(255, 255, 255);
+  --color-menu-bg: rgb(35, 35, 35);
+  --color-secondary: rgb(229, 181, 9);
 }

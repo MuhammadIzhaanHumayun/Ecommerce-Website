@@ -316,7 +316,7 @@ export default function itemsView() {
             />
           </div>
         </form>
-        <div className="flex gap-6 w-auto justify-center mt-10 [&_button]:w-25 [&_button]:rounded-sm [&_button]:px-3 [&_button]:py-2 [&_button]:hover:cursor-pointer [&_button]:text-white [&_button]:transition [&_button]:ease-in-out [&_button]:duration-200">
+        <div className="flex flex-wrap gap-6 w-auto justify-center mt-10 [&_button]:w-25 [&_button]:rounded-sm [&_button]:px-3 [&_button]:py-2 [&_button]:hover:cursor-pointer [&_button]:text-white [&_button]:transition [&_button]:ease-in-out [&_button]:duration-200">
           <button
             type="submit"
             disabled={isLoading !== ""}

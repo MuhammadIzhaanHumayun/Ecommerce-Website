@@ -36,13 +36,13 @@ export default function Login() {
   };
 
   return (
-    <div className="container h-[calc(87vh-3px)] w-auto content-center justify-items-center bg-white">
+    <div className="container h-[calc(87vh-3px)] w-auto content-center justify-items-center bg-body">
       <div className="">
         <form
           onSubmit={handleLogin}
-          className=" [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:rounded [&_label]:font-bold   flex flex-col bg-violet-500 px-10 py-8 rounded-2xl w-[30vw]"
+          className=" [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-secondary [&_input]:text-black [&_input]:p-1 [&_input]:rounded [&_label]:font-bold [&_label]:text-black  flex flex-col bg-purple-800 border-secondary border-2 px-10 py-8 rounded-2xl w-[30vw]"
         >
-          <h1 className="text-center text-3xl pb-5 font-bold text-white">
+          <h1 className="text-center text-3xl pb-5 font-bold text-secondary">
             Login
           </h1>
           <label htmlFor="email">Email</label>
@@ -56,11 +56,11 @@ export default function Login() {
           />
           <button
             type="submit"
-            className="rounded-2xl bg-fuchsia-600 py-1 text-white duration-200 ease-in-out hover:cursor-pointer hover:bg-fuchsia-500 mb-3"
+            className="rounded-2xl bg-btn-bg py-1 text-btn-text duration-200 ease-in-out hover:cursor-pointer hover:bg-btn-bg/90 mb-3"
           >
             Submit
           </button>
-          <p>
+          <p className="text-black">
             already have an account.{" "}
             <Link href="/register" className="text-fuchsia-400 underline">
               Register
