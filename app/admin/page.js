@@ -1,5 +1,5 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, Link } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DashboardView from "@/app/components/dashboardView.js";
 import OrdersView from "@/app/components/ordersView.js";
