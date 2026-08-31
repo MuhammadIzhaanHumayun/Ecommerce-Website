@@ -1,11 +1,12 @@
 "use client";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DashboardView from "@/app/components/dashboardView.js";
 import OrdersView from "@/app/components/ordersView.js";
 import ItemsView from "@/app/components/itemsView.js";
 import { LayoutDashboard, Package, ClipboardList } from "lucide-react";
 
-export default function Admin() {
+function AdminContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
@@ -60,5 +61,13 @@ export default function Admin() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function Admin() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminContent />
+    </Suspense>
   );
 }
