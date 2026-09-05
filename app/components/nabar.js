@@ -1,20 +1,60 @@
 "use client";
 import Link from "next/link";
-import { ShoppingCart, User } from "lucide-react";
-import { useState } from "react";
+import { ShoppingCart, User, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import logout from "@/app/components/logout.js";
+
+export function getcartcount() {
+  return parseInt(localStorage.getItem("items"));
+}
 
 export default function Navbar({ session }) {
   // 1. Get and verify the token
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHamMenuOpen, setHamMenuOpen] = useState(false);
+  const [cartCount, setcartCount] = useState(0);
+  useEffect(() => {
+    setcartCount(getcartcount());
+    const updateCart = () => {
+      setcartCount(getcartcount() || 0);
+    };
+
+    window.addEventListener("cartUpdated", updateCart);
+
+    return () => {
+      window.removeEventListener("cartUpdated", updateCart);
+    };
+  }, []);
 
   return (
-    <div className="flex w-full h-20 md:30 items-center justify-between p-5 bg-body/70 backdrop-blur-md sticky top-0 ">
+    <div className="flex w-full h-20 sticky z-50 items-center justify-between p-5 bg-body/70 backdrop-blur-md ">
       <Link href="/" className="text-2xl font-bold text-white">
         Food<span className="text-btn-bg">ies.</span>
       </Link>{" "}
-      <nav className=" md:block ">
-        <ul className="items-center flex flex-col md:flex-row md:[&_li]:mx-2 md:[&_li]:text-white">
+      <nav className="flex gap-3 items-center">
+        <div className="relative">
+          <a href="">
+            <ShoppingCart className="text-white hover:text-btn-bg transition-all duration-200 ease-in-out" />
+          </a>
+          <span className="absolute bottom-3 left-4 rounded-full text-center  bg-btn-bg w-4 h-4 font-bold text-[11px] text-white">
+            {cartCount}
+          </span>
+        </div>
+        <button
+          onClick={() => {
+            setHamMenuOpen(!isHamMenuOpen);
+          }}
+          className="text-white cursor-pointer md:hidden relative z-50"
+        >
+          {isHamMenuOpen ? <X /> : <Menu />}
+        </button>
+        <ul
+          className={`fixed top-20 right-0 w-50 bg-menu-bg/95 p-6 flex flex-col z-50 gap-6 rounded-tl-2xl rounded-bl-2xl md:static md:h-auto md:w-auto md:bg-transparent md:p-0 md:flex-row md:items-center [&_li]:text-white transition-transform duration-300 ease-in-out ${
+            isHamMenuOpen
+              ? "translate-x-0"
+              : "translate-x-full md:translate-x-0"
+          }`}
+        >
           <li>Contact Us</li>
           {session ? (
             <>
@@ -27,11 +67,6 @@ export default function Navbar({ session }) {
           ) : (
             ""
           )}
-          <li>
-            <a href="">
-              <ShoppingCart className="hover:text-btn-bg transition-all duration-200 ease-in-out" />
-            </a>
-          </li>
           {session ? (
             <li
               className="relative group py-2"
@@ -45,7 +80,7 @@ export default function Navbar({ session }) {
 
               {/* Dropdown Menu */}
               <div
-                className={`absolute right-0 mt-2 w-32 bg-menu-bg border border-menu-bg/70 rounded shadow-lg transition-all duration-200 ease-in-out z-50 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+                className={` absolute right-10 mt-2 w-32 bg-menu-bg border border-menu-bg/70 rounded-lg shadow-lg transition-all duration-200 ease-in-out z-50 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
               >
                 <ul className="flex flex-col pt-2 text-sm text-black">
                   <li>
