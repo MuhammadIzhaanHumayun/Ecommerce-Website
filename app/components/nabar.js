@@ -1,44 +1,86 @@
 "use client";
 import Link from "next/link";
-import { ShoppingCart, User, Menu, X } from "lucide-react";
+import Image from "next/image";
+import { ShoppingCart, User, Menu, X, Trash2, Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
 import logout from "@/app/components/logout.js";
-
-export function getcartcount() {
-  return parseInt(localStorage.getItem("items"));
-}
 
 export default function Navbar({ session }) {
   // 1. Get and verify the token
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHamMenuOpen, setHamMenuOpen] = useState(false);
-  const [cartCount, setcartCount] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   useEffect(() => {
-    setcartCount(getcartcount());
-    const updateCart = () => {
-      setcartCount(getcartcount() || 0);
+    const loadCart = () => {
+      try {
+        const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        setCart(savedCart);
+      } catch {
+        setCart([]);
+      }
     };
 
-    window.addEventListener("cartUpdated", updateCart);
+    loadCart();
+
+    window.addEventListener("cartUpdated", loadCart);
 
     return () => {
-      window.removeEventListener("cartUpdated", updateCart);
+      window.removeEventListener("cartUpdated", loadCart);
     };
   }, []);
 
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const removeFromCart = (id) => {
+    const updatedCart = cart.filter((item) => item.id !== id);
+
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const increaseQuantity = (id) => {
+    const updatedCart = cart.map((item) =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+    );
+
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const decreaseQuantity = (id) => {
+    const updatedCart = cart.map((item) =>
+      item.id === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item,
+    );
+
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const tax = (total * 0.13).toFixed(2);
+
   return (
-    <div className="flex w-full h-20 sticky z-50 items-center justify-between p-5 bg-body/70 backdrop-blur-md ">
+    <div className="flex w-full h-20 items-center justify-between p-5 bg-body/70 border-b border-black">
       <Link href="/" className="text-2xl font-bold text-white">
         Food<span className="text-btn-bg">ies.</span>
       </Link>{" "}
       <nav className="flex gap-3 items-center">
         <div className="relative">
-          <a href="">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="cursor-pointer"
+          >
             <ShoppingCart className="text-white hover:text-btn-bg transition-all duration-200 ease-in-out" />
-          </a>
-          <span className="absolute bottom-3 left-4 rounded-full text-center  bg-btn-bg w-4 h-4 font-bold text-[11px] text-white">
-            {cartCount}
-          </span>
+          </button>
+
+          {cartCount > 0 && (
+            <span className="absolute bottom-3 left-4 rounded-full text-center bg-btn-bg w-4 h-4 font-bold text-[11px] text-white">
+              {cartCount}
+            </span>
+          )}
         </div>
         <button
           onClick={() => {
@@ -113,6 +155,106 @@ export default function Navbar({ session }) {
           )}
         </ul>
       </nav>
+      {/* Background Overlay */}
+      {isCartOpen && (
+        <div
+          onClick={() => setIsCartOpen(false)}
+          className="fixed inset-0 bg-black/40 z-50"
+        />
+      )}
+      {/* Cart Side Panel */}
+      <div
+        className={`fixed top-0 right-0 h-screen w-80 sm:w-96 bg-white z-60 shadow-xl transform transition-transform duration-300 ${
+          isCartOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-300">
+          <h2 className="text-secondary text-3xl text-center font-bold">
+            Cart
+          </h2>
+
+          <button
+            onClick={() => setIsCartOpen(false)}
+            className="cursor-pointer"
+          >
+            <X />
+          </button>
+        </div>
+
+        {/* Cart Items */}
+        <div className="p-5 overflow-y-auto h-85 scrollbar-none">
+          {cart.length === 0 ? (
+            <p className="text-center text-gray-500 mt-10">
+              Your cart is empty
+            </p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {cart.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 ">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={70}
+                    height={70}
+                    className="w-17 h-17 object-cover rounded-lg"
+                  />
+
+                  <div className="flex-1">
+                    <h3 className="font-bold">{item.name}</h3>
+
+                    <p className="text-gray-500">Rs. {item.price}</p>
+
+                    <p className="text-sm flex gap-2">
+                      Qty:
+                      <div className="flex items-center gap-2 px-1 rounded-2xl border border-gray-600">
+                        <Plus
+                          size={16}
+                          onClick={() => increaseQuantity(item.id)}
+                          className="text-gray-500 cursor-pointer"
+                        />{" "}
+                        {item.quantity}{" "}
+                        <Minus
+                          size={16}
+                          onClick={() => decreaseQuantity(item.id)}
+                          className="text-gray-500 cursor-pointer"
+                        />
+                      </div>
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-red-500 hover:text-red-700 cursor-pointer"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="p-5 border-t border-gray-300">
+          <div className="flex justify-between font-semibold text-sm">
+            <span>Subtotal:</span>
+            <span>Rs. {total}</span>
+          </div>
+          <div className="flex justify-between font-semibold text-sm mt-2">
+            <span>Tax (13%):</span>
+            <span>Rs. {tax}</span>
+          </div>
+          <div className="flex justify-between font-bold text-lg mt-2">
+            <span>Total:</span>
+            <span>Rs. {total + parseFloat(tax)}</span>
+          </div>
+          <button
+            className={`w-full mt-4 bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={cart.length === 0}
+          >
+            Checkout
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

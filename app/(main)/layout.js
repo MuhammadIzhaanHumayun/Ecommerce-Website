@@ -1,6 +1,5 @@
 import Navbar from "@/app/components/nabar";
 import Session from "@/app/components/session";
-import Footer from "@/app/components/footer";
 
 export const metadata = {
   title: "Home",
@@ -18,9 +17,6 @@ export default async function MainLayout({ children }) {
         <Navbar session={session} />
       </header>
       <main>{children}</main>
-      <footer>
-        <Footer />
-      </footer>
     </>
   );
 }

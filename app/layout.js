@@ -15,6 +15,9 @@ export default function RootLayout({ children }) {
     >
       <body className="scrollbar-gutter-stable scroll-smooth overflow-x-hidden">
         {children}
+        <footer>
+          <Footer />
+        </footer>
       </body>
     </html>
   );

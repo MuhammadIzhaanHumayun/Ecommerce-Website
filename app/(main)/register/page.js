@@ -43,9 +43,9 @@ const Register = () => {
       <div>
         <form
           onSubmit={handleRegister}
-          className=" [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:rounded [&_label]:font-bold   flex flex-col bg-violet-500 px-10 py-8 rounded-2xl w-[30vw]"
+          className="[&_label]:text-white [&_input]:text-white [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:focus:border-secondary [&_input]:rounded [&_label]:font-bold   flex flex-col bg-body px-10 py-8 rounded-2xl w-[30vw]"
         >
-          <h1 className="text-center text-3xl pb-5 font-bold text-white">
+          <h1 className="text-center text-3xl pb-5 font-bold text-secondary">
             Register
           </h1>
           <label htmlFor="fullname">Full Name</label>
@@ -60,13 +60,13 @@ const Register = () => {
           <input type="text" name="gender" required />
           <button
             type="submit"
-            className="rounded-2xl bg-fuchsia-600 py-1 text-white duration-200 hover:cursor-pointer hover:bg-fuchsia-500 mb-3"
+            className="rounded-2xl bg-btn-bg py-1 text-white duration-200 hover:cursor-pointer hover:bg-btn-bg/80 mb-3"
           >
-            Submit
+            Register
           </button>
-          <p>
+          <p className="text-white">
             already have an account.{" "}
-            <Link href="/login" className="text-fuchsia-400 underline">
+            <Link href="/login" className="text-secondary underline">
               Login
             </Link>
           </p>

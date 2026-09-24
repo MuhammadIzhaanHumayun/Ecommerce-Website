@@ -8,15 +8,26 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedcategory] = useState();
 
-  const addToCart = () => {
-    if (localStorage.getItem("items") !== null) {
-      let cart = parseInt(localStorage.getItem("items"));
-      let items = cart + 1;
-      localStorage.setItem("items", items);
-      window.dispatchEvent(new Event("cartUpdated"));
+  const addToCart = (product) => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const existingItem = cart.find((item) => item.id === product.id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
     } else {
-      localStorage.setItem("items", 1); // Fixed this from 0 to 1 for the first item
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+      });
     }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    window.dispatchEvent(new Event("cartUpdated"));
   };
 
   useEffect(() => {
@@ -70,7 +81,7 @@ export default function Home() {
   return (
     <>
       <div className="w-full z-0 py-3 justify-items-center overflow-hidden">
-        <div className="relative z-0 w-full max-w-200 mx-auto overflow-hidden">
+        <div className="relative z-0 w-full max-w-245 mx-auto rounded-xl overflow-hidden">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -92,7 +103,7 @@ export default function Home() {
       </div>
       <div className="w-full h-s px-5 bg-white justify-items-center">
         <h1 className="py-10 text-5xl font-semibold text-center">Menu</h1>
-        <ul className="w-full flex gap-5 px-7 md:justify-center py-3 rounded-full sticky top-0 z-50 backdrop-blur-3xl overflow-x-scroll scrollbar-none ">
+        <ul className="w-full flex gap-5 px-6 md:justify-center py-3 rounded-full sticky top-0 z-50 backdrop-blur-3xl overflow-x-scroll scrollbar-none ">
           {category &&
             category.map((cat) => (
               <li key={cat.id}>
@@ -137,7 +148,7 @@ export default function Home() {
                 <p className="my-2 font-bold text-xl mx-3">Rs. {p.price}</p>
                 <button
                   onClick={() => {
-                    addToCart();
+                    addToCart(p);
                   }}
                   className="py-2 mx-3 mt-2 mb-3 bg-btn-bg text-btn-text hover:bg-btn-bg/90 ease-in-out duration-200 rounded-full font-bold cursor-pointer"
                 >
