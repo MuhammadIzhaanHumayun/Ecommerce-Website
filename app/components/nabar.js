@@ -3,15 +3,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart, User, Menu, X, Trash2, Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import logout from "@/app/components/logout.js";
 
 export default function Navbar({ session }) {
-  // 1. Get and verify the token
+  const pathname = usePathname();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHamMenuOpen, setHamMenuOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [Total, settotal] = useState(0);
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
   useEffect(() => {
     const loadCart = () => {
       try {
@@ -30,6 +34,10 @@ export default function Navbar({ session }) {
       window.removeEventListener("cartUpdated", loadCart);
     };
   }, []);
+
+  useEffect(() => {
+    setIsCartOpen(false);
+  }, [pathname]);
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -61,27 +69,34 @@ export default function Navbar({ session }) {
   };
 
   const tax = (total * 0.13).toFixed(2);
+  var sum = total + parseFloat(tax);
+
+  const saveTotal = (sum) => {
+    localStorage.setItem("total", JSON.stringify(sum));
+  };
 
   return (
-    <div className="flex w-full h-20 items-center justify-between p-5 bg-body/70 border-b border-black">
+    <div className="flex w-full h-15 items-center justify-between p-5 bg-transparent">
       <Link href="/" className="text-2xl font-bold text-white">
         Food<span className="text-btn-bg">ies.</span>
       </Link>{" "}
       <nav className="flex gap-3 items-center">
-        <div className="relative">
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="cursor-pointer"
-          >
-            <ShoppingCart className="text-white hover:text-btn-bg transition-all duration-200 ease-in-out" />
-          </button>
+        {pathname !== "/checkout" && (
+          <div className="relative">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="cursor-pointer"
+            >
+              <ShoppingCart className="text-white hover:text-btn-bg transition-all duration-200 ease-in-out" />
+            </button>
 
-          {cartCount > 0 && (
-            <span className="absolute bottom-3 left-4 rounded-full text-center bg-btn-bg w-4 h-4 font-bold text-[11px] text-white">
-              {cartCount}
-            </span>
-          )}
-        </div>
+            {cartCount > 0 && (
+              <span className="absolute bottom-3 left-4 rounded-full text-center bg-btn-bg w-4 h-4 font-bold text-[11px] text-white">
+                {cartCount}
+              </span>
+            )}
+          </div>
+        )}
         <button
           onClick={() => {
             setHamMenuOpen(!isHamMenuOpen);
@@ -122,7 +137,7 @@ export default function Navbar({ session }) {
 
               {/* Dropdown Menu */}
               <div
-                className={` absolute right-10 mt-2 w-32 bg-menu-bg border border-menu-bg/70 rounded-lg shadow-lg transition-all duration-200 ease-in-out z-50 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+                className={` absolute right-0 mt-2 w-32 bg-menu-bg border border-menu-bg/70 rounded-lg shadow-lg transition-all duration-200 ease-in-out z-50 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
               >
                 <ul className="flex flex-col pt-2 text-sm text-black">
                   <li>
@@ -183,7 +198,7 @@ export default function Navbar({ session }) {
         </div>
 
         {/* Cart Items */}
-        <div className="p-5 overflow-y-auto h-85 scrollbar-none">
+        <div className="p-5 overflow-y-auto h-[calc(100dvh-16rem)] scrollbar-none">
           {cart.length === 0 ? (
             <p className="text-center text-gray-500 mt-10">
               Your cart is empty
@@ -205,7 +220,7 @@ export default function Navbar({ session }) {
 
                     <p className="text-gray-500">Rs. {item.price}</p>
 
-                    <p className="text-sm flex gap-2">
+                    <div className="text-sm flex gap-2">
                       Qty:
                       <div className="flex items-center gap-2 px-1 rounded-2xl border border-gray-600">
                         <Plus
@@ -220,7 +235,7 @@ export default function Navbar({ session }) {
                           className="text-gray-500 cursor-pointer"
                         />
                       </div>
-                    </p>
+                    </div>
                   </div>
 
                   <button
@@ -245,14 +260,20 @@ export default function Navbar({ session }) {
           </div>
           <div className="flex justify-between font-bold text-lg mt-2">
             <span>Total:</span>
-            <span>Rs. {total + parseFloat(tax)}</span>
+            <span>Rs. {sum}</span>
           </div>
-          <button
-            className={`w-full mt-4 bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={cart.length === 0}
-          >
-            Checkout
-          </button>
+          <Link href="/checkout">
+            <button
+              className={`w-full mt-4 bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+              onClick={() => {
+                setIsCartOpen(false);
+                saveTotal(sum);
+              }}
+              disabled={cart.length === 0}
+            >
+              Checkout
+            </button>
+          </Link>
         </div>
       </div>
     </div>

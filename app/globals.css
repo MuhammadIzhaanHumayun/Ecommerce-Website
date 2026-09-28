@@ -8,5 +8,6 @@ body {
   --color-btn-bg: rgb(229, 181, 9);
   --color-btn-text: rgb(255, 255, 255);
   --color-menu-bg: rgb(35, 35, 35);
+  --color-primary: rgb(255, 255, 255);
   --color-secondary: rgb(229, 181, 9);
 }
