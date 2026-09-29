@@ -43,7 +43,7 @@ const Register = () => {
       <div>
         <form
           onSubmit={handleRegister}
-          className="[&_label]:text-white [&_input]:text-white [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:focus:border-secondary [&_input]:rounded [&_label]:font-bold   flex flex-col bg-body px-10 py-8 rounded-2xl w-[30vw]"
+          className="[&_label]:text-white [&_input]:text-white [&_input]:mb-3 [&_input]:outline-none [&_input]:px-2 [&_input]:border-2 [&_input]:border-white [&_input]:focus:border-secondary [&_input]:rounded [&_label]:font-bold   flex flex-col bg-body px-10 py-8 rounded-2xl w-80 md:w-100"
         >
           <h1 className="text-center text-3xl pb-5 font-bold text-secondary">
             Register

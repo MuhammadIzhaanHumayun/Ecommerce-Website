@@ -80,7 +80,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full z-0 py-3 justify-items-center overflow-hidden">
+      <div className="w-full z-0 py-6 justify-items-center overflow-hidden">
         <div className="relative z-0 w-full max-w-245 mx-auto rounded-xl overflow-hidden">
           <div
             className="flex transition-transform duration-700 ease-in-out"
@@ -103,15 +103,15 @@ export default function Home() {
       </div>
       <div className="w-full h-s px-5 bg-white justify-items-center">
         <h1 className="py-10 text-5xl font-semibold text-center">Menu</h1>
-        <ul className="w-full flex gap-5 px-6 md:justify-center py-3 rounded-full sticky top-0 z-50 backdrop-blur-3xl overflow-x-scroll scrollbar-none ">
+        <ul className="w-full flex gap-3 px-6 md:justify-center py-3 rounded-full sticky top-0 z-50 backdrop-blur-3xl overflow-x-scroll scrollbar-none ">
           {category &&
             category.map((cat) => (
               <li key={cat.id}>
                 <button
                   onClick={() => setSelectedcategory(cat.id)}
-                  className={`cursor-pointer text-xl whitespace-nowrap ${
+                  className={`cursor-pointer text-lg whitespace-nowrap px-2 rounded-2xl transition-all duration-300 ease-in-out hover:border-2 hover:border-btn-bg hover:shadow ${
                     selectedCategory === cat.id
-                      ? "border-b-2 border-btn-bg"
+                      ? "border-2 border-btn-bg text-xl! shadow-lg md:text-lg font-semibold"
                       : ""
                   } `}
                 >

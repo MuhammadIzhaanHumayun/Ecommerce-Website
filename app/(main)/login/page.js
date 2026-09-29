@@ -37,7 +37,7 @@ export default function Login() {
   };
 
   return (
-    <div className="container h-[calc(76vh-3px)] w-auto content-center justify-items-center bg-white">
+    <div className="container h-[calc(100dvh-7rem)] w-auto content-center justify-items-center bg-white">
       <div className="">
         <form
           onSubmit={handleLogin}
