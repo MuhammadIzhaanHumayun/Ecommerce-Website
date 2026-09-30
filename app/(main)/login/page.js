@@ -37,8 +37,8 @@ export default function Login() {
   };
 
   return (
-    <div className="container h-[calc(100dvh-7rem)] w-auto content-center justify-items-center bg-white">
-      <div className="">
+    <div className="h-dvh w-full justify-items-center bg-white">
+      <div className="pt-12">
         <form
           onSubmit={handleLogin}
           className="[&_input]:w-full [&_input]:overflow-hidden [&_input]:mb-3 [&_input]:outline-none [&_input]:px-10 [&_input]:border-2 [&_input]:border-secondary [&_input]:text-white [&_input]:p-1 [&_input]:rounded  flex flex-col bg-body px-6 py-5 rounded-2xl w-70 md:w-80"

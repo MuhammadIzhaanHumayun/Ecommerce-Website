@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+  const [toasts, setToasts] = useState([]);
   const [category, setCategory] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedcategory] = useState();
@@ -13,8 +15,11 @@ export default function Home() {
 
     const existingItem = cart.find((item) => item.id === product.id);
 
+    let quantity = 1;
+
     if (existingItem) {
       existingItem.quantity += 1;
+      quantity = existingItem.quantity;
     } else {
       cart.push({
         id: product.id,
@@ -28,11 +33,39 @@ export default function Home() {
     localStorage.setItem("cart", JSON.stringify(cart));
 
     window.dispatchEvent(new Event("cartUpdated"));
+
+    const toastId = Date.now();
+
+    const newToast = {
+      id: toastId,
+      message: `${product.name} x ${quantity} added to cart`,
+    };
+
+    setToasts((prev) => [...prev, newToast]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== toastId));
+    }, 2000);
   };
 
   useEffect(() => {
-    const fetchBoth = async () => {
+    const loadData = async () => {
       try {
+        const cachedData = JSON.parse(localStorage.getItem("homeData"));
+
+        // Use cache if it exists and hasn't expired
+        if (cachedData && Date.now() - cachedData.timestamp < CACHE_TIME) {
+          setCategory(cachedData.categories);
+          setProducts(cachedData.products);
+
+          if (cachedData.categories.length > 0) {
+            setSelectedcategory(cachedData.categories[0].id);
+          }
+
+          return;
+        }
+
+        // Otherwise fetch fresh data
         const [categoriesRes, productsRes] = await Promise.all([
           fetch("/api/Categories"),
           fetch("/api/Product"),
@@ -43,15 +76,26 @@ export default function Home() {
 
         setCategory(categoriesData);
         setProducts(productsData);
+
         if (categoriesData.length > 0) {
           setSelectedcategory(categoriesData[0].id);
         }
+
+        // Save in cache
+        localStorage.setItem(
+          "homeData",
+          JSON.stringify({
+            categories: categoriesData,
+            products: productsData,
+            timestamp: Date.now(),
+          }),
+        );
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error loading data:", error);
       }
     };
 
-    fetchBoth();
+    loadData();
   }, []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,6 +139,7 @@ export default function Home() {
                   alt={`banner-${index}`}
                   className="w-full h-auto"
                   priority={index === 0}
+                  loading="eager"
                 />
               </div>
             ))}
@@ -158,6 +203,64 @@ export default function Home() {
             ))
           )}
         </div>
+      </div>
+      <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className="flex items-center w-full p-4 text-gray-700 bg-white rounded-xl shadow-lg border border-gray-200"
+            role="alert"
+          >
+            <div className="inline-flex items-center justify-center shrink-0 w-7 h-7 text-green-600 bg-green-100 rounded">
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 11.917 9.724 16.5 19 7.5"
+                />
+              </svg>
+            </div>
+
+            <div className="ms-3 text-sm font-normal">{toast.message}</div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setToasts((prev) => prev.filter((item) => item.id !== toast.id))
+              }
+              className="ms-auto flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent rounded-lg h-8 w-8 cursor-pointer"
+              aria-label="Close"
+            >
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18 17.94 6M18 18 6.06 6"
+                />
+              </svg>
+            </button>
+          </div>
+        ))}
       </div>
     </>
   );

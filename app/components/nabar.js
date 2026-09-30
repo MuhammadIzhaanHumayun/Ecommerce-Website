@@ -195,7 +195,7 @@ export default function Navbar({ session }) {
             </li>
           ) : (
             <li>
-              <button className="bg-btn-bg text-btn-text rounded-2xl px-4 py-2 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer">
+              <button className="bg-btn-bg text-btn-text rounded-2xl px-3 py-1.5 ease-in duration-200 hover:bg-btn-bg/90 hover:cursor-pointer">
                 <Link href="/login">Login</Link> /{" "}
                 <Link href="/register">Register</Link>
               </button>
