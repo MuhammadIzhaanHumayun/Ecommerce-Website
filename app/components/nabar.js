@@ -59,6 +59,18 @@ export default function Navbar({ session }) {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isCartOpen]);
+
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   const removeFromCart = (id) => {

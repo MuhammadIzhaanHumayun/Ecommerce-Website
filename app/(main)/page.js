@@ -100,19 +100,12 @@ export default function Home() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const banners = [
-    "/banner.jpg",
-    "/banner.jpg",
-    "/banner.jpg",
-    "/banner.jpg",
-    "/banner.jpg",
-    "/banner.jpg",
-  ];
+  const banners = ["/banner1.jpg", "/banner3.jpg", "/banner2.png"];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [banners.length]);
@@ -125,7 +118,7 @@ export default function Home() {
   return (
     <>
       <div className="w-full z-0 py-6 justify-items-center overflow-hidden">
-        <div className="relative z-0 w-full max-w-245 mx-auto rounded-xl overflow-hidden">
+        <div className="relative z-0 w-full max-w-300 mx-auto rounded-xl overflow-hidden">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}

@@ -35,7 +35,7 @@ export default function Checkout() {
 
   return cart.length > 0 ? (
     <>
-      <div className="h-dvh w-auto bg-primary p-5 md:p-10">
+      <div className="flex-1 w-full bg-primary p-5 md:p-10">
         <form>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="h-fit md:col-span-2 rounded-xl p-5 border border-gray-200">
@@ -160,10 +160,8 @@ export default function Checkout() {
       </div>
     </>
   ) : (
-    <>
-      <div className=" w-auto h-dvh bg-white text-center text-gray-600 content-center">
-        <p className="text-xl md:3xl py-72 md:py-0">Your cart is empty.</p>
-      </div>
-    </>
+    <div className="flex-1 w-full bg-white flex items-center justify-center text-gray-600">
+      <p className="text-xl md:text-3xl">Your cart is empty.</p>
+    </div>
   );
 }

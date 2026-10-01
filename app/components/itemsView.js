@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { UploadButton } from "@/utils/uploadthing";
+import Image from "next/image";
 import "@uploadthing/react/styles.css";
 
 export default function itemsView() {
@@ -190,7 +191,7 @@ export default function itemsView() {
         <table className="min-w-full overflow-scroll border border-collapse text-center text-wrap [&_th,&_td]:border [&_th]:bg-yellow-400 [&_th]:text-white [&_td]:px-1 rounded-2xl">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>S.NO</th>
               <th>Product</th>
               <th>Description</th>
               <th>Category</th>
@@ -199,9 +200,9 @@ export default function itemsView() {
             </tr>
           </thead>
           <tbody className="bg-gray-200">
-            {products.map((p) => (
+            {products.map((p, index) => (
               <tr key={p.id} onClick={() => handleRowClick(p)}>
-                <td>{p.id}</td>
+                <td>{index + 1}</td>
                 <td className="max-w-20 min-w-5 scrollbar-none select-text overflow-y-hidden overflow-x-auto whitespace-nowrap">
                   {p.name}
                 </td>
@@ -211,8 +212,16 @@ export default function itemsView() {
                 <td className="max-w-20 min-w-5 scrollbar-none select-text overflow-y-hidden overflow-x-auto whitespace-nowrap">
                   {p.category.name}
                 </td>
-                <td className="max-w-20 min-w-5 scrollbar-none overflow-y-hidden select-text overflow-x-auto whitespace-nowrap">
-                  {p.image}
+                <td className="max-w-20 min-w-5 scrollbar-none overflow-y-hidden select-text overflow-x-auto whitespace-nowrap justify-items-center">
+                  <Image src={p.image} alt={p.name} width={80} height={80} />
+                  <a
+                    href={p.image}
+                    className="text-secondary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Image
+                  </a>
                 </td>
                 <td>{p.price}</td>
               </tr>
