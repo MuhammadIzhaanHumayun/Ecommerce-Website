@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { UploadButton } from "@/utils/uploadthing";
 import Image from "next/image";
+import Link from "next/link";
 import "@uploadthing/react/styles.css";
+import CategoryModal from "./CategoryModal";
 
 export default function itemsView() {
   const [imageUrl, setImageUrl] = useState("");
@@ -19,10 +21,19 @@ export default function itemsView() {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const allproducts = async () => {
     const response = await fetch("/api/Product");
     const data = await response.json();
     setproducts(data);
+  };
+
+  const allcategory = async () => {
+    const res = await fetch("/api/Categories");
+    const data = await res.json();
+    console.log(data);
+    setCategory(data);
   };
 
   const handleRowClick = (product) => {
@@ -311,6 +322,13 @@ export default function itemsView() {
                 </option>
               ))}
             </select>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="text-left text-xs text-blue-600 mt-1 w-max relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:delay-200 after:origin-left"
+            >
+              manage categories
+            </button>
           </div>
           <div className="flex flex-col">
             <label htmlFor="price">Price</label>
@@ -352,6 +370,12 @@ export default function itemsView() {
           </button>
         </div>
       </div>
+      <CategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        categories={category}
+        onRefresh={allcategory}
+      />
     </>
   );
 }

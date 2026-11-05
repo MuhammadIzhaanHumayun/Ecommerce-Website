@@ -147,7 +147,7 @@ export default function Home() {
               <li key={cat.id}>
                 <button
                   onClick={() => setSelectedcategory(cat.id)}
-                  className={`cursor-pointer text-lg whitespace-nowrap px-2 rounded-2xl transition-all duration-300 ease-in-out hover:border-2 hover:border-btn-bg hover:shadow ${
+                  className={`cursor-pointer text-lg whitespace-nowrap px-2 rounded-2xl transition-all duration-100 ease-in-out hover:border hover:border-btn-bg hover:shadow ${
                     selectedCategory === cat.id
                       ? "border-2 border-btn-bg text-xl! shadow-lg md:text-lg font-semibold"
                       : ""
