@@ -9,6 +9,8 @@ export default function Home() {
   const [category, setCategory] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedcategory] = useState();
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryCountdown, setRetryCountdown] = useState(0);
 
   const addToCart = (product) => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -48,39 +50,88 @@ export default function Home() {
     }, 2000);
   };
 
+  const handleRetry = async () => {
+    if (isRetrying) return;
+
+    setIsRetrying(true);
+    setRetryCountdown(5);
+
+    const countdown = setInterval(() => {
+      setRetryCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdown);
+          setIsRetrying(false);
+          return 0;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    try {
+      const [categoriesRes, productsRes] = await Promise.all([
+        fetch("/api/Categories"),
+        fetch("/api/Product"),
+      ]);
+
+      if (!categoriesRes.ok || !productsRes.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const categoriesData = await categoriesRes.json();
+      const productsData = await productsRes.json();
+
+      if (!Array.isArray(categoriesData) || !Array.isArray(productsData)) {
+        throw new Error("Invalid API response");
+      }
+
+      setCategory(categoriesData);
+      setProducts(productsData);
+
+      if (categoriesData.length > 0) {
+        setSelectedcategory(categoriesData[0].id);
+      } else {
+        setSelectedcategory(undefined);
+      }
+
+      localStorage.setItem(
+        "homeData",
+        JSON.stringify({
+          categories: categoriesData,
+          products: productsData,
+          timestamp: Date.now(),
+        }),
+      );
+    } catch (error) {
+      console.error("Error retrying data:", error);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const cachedData = JSON.parse(localStorage.getItem("homeData"));
-
         // Use cache if it exists and hasn't expired
         if (cachedData && Date.now() - cachedData.timestamp < CACHE_TIME) {
           setCategory(cachedData.categories);
           setProducts(cachedData.products);
-
           if (cachedData.categories.length > 0) {
             setSelectedcategory(cachedData.categories[0].id);
           }
-
           return;
         }
-
         // Otherwise fetch fresh data
         const [categoriesRes, productsRes] = await Promise.all([
           fetch("/api/Categories"),
           fetch("/api/Product"),
         ]);
-
         const categoriesData = await categoriesRes.json();
         const productsData = await productsRes.json();
-
         setCategory(categoriesData);
         setProducts(productsData);
-
         if (categoriesData.length > 0) {
           setSelectedcategory(categoriesData[0].id);
         }
-
         // Save in cache
         localStorage.setItem(
           "homeData",
@@ -142,7 +193,7 @@ export default function Home() {
       <div className="w-full h-s px-5 bg-white justify-items-center">
         <h1 className="py-10 text-5xl font-semibold text-center">Menu</h1>
         <ul className="w-full flex gap-3 px-6 md:justify-center py-3 rounded-full sticky top-0 z-50 backdrop-blur-3xl overflow-x-scroll scrollbar-none ">
-          {category &&
+          {category != 0 &&
             category.map((cat) => (
               <li key={cat.id}>
                 <button
@@ -158,12 +209,22 @@ export default function Home() {
               </li>
             ))}
         </ul>
-        <div className="w-[calc(100vw-8%)] min-h-50 flex flex-wrap gap-4 mt-5 py-5 justify-center md:justify-normal">
-          {/* 2. CHECK IF EMPTY OR RENDER PRODUCTS */}
+        <div className="w-[calc(100vw-8%)] min-h-60 flex flex-wrap gap-4 mt-5 py-5 justify-center md:justify-normal">
           {filteredProducts.length === 0 ? (
-            <p className="w-full text-center text-xl font-bold text-gray-500 mt-10">
-              No products found
-            </p>
+            <div className="w-full flex flex-col items-center">
+              <p className="text-center text-xl font-bold text-gray-500 mt-10">
+                No products found
+              </p>
+              <button
+                onClick={handleRetry}
+                disabled={isRetrying}
+                className={`mt-3 w-30 px-2 py-1 rounded-md text-sm cursor-pointer bg-btn-bg/90 text-btn-text hover:bg-btn-bg ${
+                  isRetrying ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {isRetrying ? `Wait ${retryCountdown}s` : "Try Again"}
+              </button>
+            </div>
           ) : (
             filteredProducts.map((p) => (
               <div

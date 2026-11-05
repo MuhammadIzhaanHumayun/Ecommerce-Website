@@ -126,7 +126,7 @@ export default function Checkout() {
                           Rs. {item.price.toFixed(0)} x {item.quantity}
                         </p>
                       </div>
-                      <p className=" font-bold">
+                      <p className="font-bold">
                         Rs. {(item.price * item.quantity).toFixed(0)}
                       </p>
                     </div>
