@@ -21,6 +21,10 @@ export default function itemsView() {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
 
+  // Optional product variants
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variants, setVariants] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const allproducts = async () => {
@@ -43,6 +47,52 @@ export default function itemsView() {
     setDescription(product.description || "");
     setCategoryId(product.category?.id || "");
     setImageUrl(product.image || "");
+
+    // Load existing variants when selecting a product
+    const existingVariants = product.variants || [];
+    setHasVariants(existingVariants.length > 0);
+    setVariants(
+      existingVariants.map((variant) => ({
+        name: variant.name,
+        price: String(variant.price),
+      }))
+    );
+  };
+
+  const resetProductForm = () => {
+    setSelectedProductId(null);
+    setName("");
+    setPrice("");
+    setDescription("");
+    setCategoryId("");
+    setImageUrl("");
+    setHasVariants(false);
+    setVariants([]);
+  };
+
+  const addVariantField = () => {
+    setVariants((current) => [...current, { name: "", price: "" }]);
+  };
+
+  const updateVariantField = (index, field, value) => {
+    setVariants((current) =>
+      current.map((variant, i) =>
+        i === index ? { ...variant, [field]: value } : variant
+      )
+    );
+  };
+
+  const removeVariantField = (index) => {
+    setVariants((current) => current.filter((_, i) => i !== index));
+  };
+
+  const getVariantPayload = () => {
+    if (!hasVariants) return [];
+
+    return variants.map((variant) => ({
+      name: variant.name.trim(),
+      price: Number(variant.price),
+    }));
   };
   useEffect(() => {
     allproducts();
@@ -70,6 +120,21 @@ export default function itemsView() {
   }, [Isuploaded]);
 
   const add = async (e) => {
+    e.preventDefault();
+
+    if (hasVariants && (
+      variants.length === 0 ||
+      variants.some((v) => !v.name.trim() || v.price === "" || Number(v.price) < 0)
+    )) {
+      alert("Please enter a name and a valid price for every variant.");
+      return;
+    }
+
+    if (!hasVariants && (price === "" || Number(price) < 0)) {
+      alert("Please enter a valid product price.");
+      return;
+    }
+
     try {
       setIsLoading("add");
       const response = await fetch("/api/Product", {
@@ -81,8 +146,9 @@ export default function itemsView() {
           name,
           imageUrl,
           description,
-          price,
+          price: hasVariants ? 0 : Number(price),
           categoryId,
+          variants: getVariantPayload(),
         }),
       });
 
@@ -96,12 +162,7 @@ export default function itemsView() {
         alert(result.message);
         allproducts();
         // Clear the form fields after adding
-        setName("");
-        setPrice("");
-        setDescription("");
-        setCategoryId("");
-        setImageUrl("");
-        setSelectedProductId(null);
+        resetProductForm();
       }
     } catch (error) {
       console.log(error);
@@ -111,6 +172,26 @@ export default function itemsView() {
   };
 
   const update = async (e) => {
+    e.preventDefault();
+
+    if (!selectedProductId) {
+      alert("Please select a product from the table first.");
+      return;
+    }
+
+    if (hasVariants && (
+      variants.length === 0 ||
+      variants.some((v) => !v.name.trim() || v.price === "" || Number(v.price) < 0)
+    )) {
+      alert("Please enter a name and a valid price for every variant.");
+      return;
+    }
+
+    if (!hasVariants && (price === "" || Number(price) < 0)) {
+      alert("Please enter a valid product price.");
+      return;
+    }
+
     try {
       setIsLoading("update");
       const response = await fetch("/api/Product", {
@@ -123,8 +204,9 @@ export default function itemsView() {
           name,
           imageUrl,
           description,
-          price,
+          price: hasVariants ? 0 : Number(price),
           categoryId,
+          variants: getVariantPayload(),
         }),
       });
       console.log(
@@ -145,12 +227,7 @@ export default function itemsView() {
         alert(result.message);
         allproducts();
         // Clear the form fields after adding
-        setName("");
-        setPrice("");
-        setDescription("");
-        setCategoryId("");
-        setImageUrl("");
-        setSelectedProductId(null);
+        resetProductForm();
       }
     } catch (error) {
       console.log(error);
@@ -160,6 +237,13 @@ export default function itemsView() {
   };
 
   const remove = async (e) => {
+    e.preventDefault();
+
+    if (!selectedProductId) {
+      alert("Please select a product from the table first.");
+      return;
+    }
+
     try {
       setIsLoading("delete");
       const response = await fetch("/api/Product", {
@@ -182,12 +266,7 @@ export default function itemsView() {
         alert(result.message);
         allproducts();
         // Clear the form fields after adding
-        setName("");
-        setPrice("");
-        setDescription("");
-        setCategoryId("");
-        setImageUrl("");
-        setSelectedProductId(null);
+        resetProductForm();
       }
     } catch (error) {
       console.log(error);
@@ -234,7 +313,11 @@ export default function itemsView() {
                     View Image
                   </a>
                 </td>
-                <td>{p.price}</td>
+                <td>
+                  {p.variants?.length > 0
+                    ? `From Rs. ${Math.min(...p.variants.map((v) => v.price))}`
+                    : p.price}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -331,17 +414,124 @@ export default function itemsView() {
             </button>
           </div>
           <div className="flex flex-col">
-            <label htmlFor="price">Price</label>
-            <input
-              name="price"
-              className="border rounded-lg px-2 py-1"
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price"
-              required
-            />
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={hasVariants}
+                onChange={(e) => {
+                  const enabled = e.target.checked;
+                  setHasVariants(enabled);
+                  if (enabled) {
+                    setPrice("");
+                    if (variants.length === 0) {
+                      setVariants([{ name: "", price: "" }]);
+                    }
+                  } else {
+                    setVariants([]);
+                  }
+                }}
+              />
+              This product has variants
+            </label>
+
+            {!hasVariants && (
+              <>
+                <label htmlFor="price">Price</label>
+                <input
+                  name="price"
+                  className="border rounded-lg px-2 py-1"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="Price"
+                  required={!hasVariants}
+                />
+              </>
+            )}
           </div>
+
+          {hasVariants && (
+            <div className="w-full mt-3 border rounded-lg p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div>
+                  <h3 className="font-semibold">Product Variants</h3>
+                  <p className="text-sm text-gray-500">
+                    Add options such as Small, Medium, 350 ml or Double Patty.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addVariantField}
+                  className="rounded-md bg-blue-600 hover:bg-blue-500 text-white px-3 py-2"
+                >
+                  + Add Variant
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {variants.map((variant, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-wrap items-end gap-3"
+                  >
+                    <div className="flex flex-col flex-1 min-w-35">
+                      <label htmlFor={`variant-name-${index}`}>
+                        Variant Name
+                      </label>
+                      <input
+                        id={`variant-name-${index}`}
+                        type="text"
+                        className="border rounded-lg px-2 py-1"
+                        placeholder="e.g. Medium"
+                        value={variant.name}
+                        onChange={(e) =>
+                          updateVariantField(index, "name", e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-35">
+                      <label htmlFor={`variant-price-${index}`}>
+                        Variant Price
+                      </label>
+                      <input
+                        id={`variant-price-${index}`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        className="border rounded-lg px-2 py-1"
+                        placeholder="Price"
+                        value={variant.price}
+                        onChange={(e) =>
+                          updateVariantField(index, "price", e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removeVariantField(index)}
+                      className="rounded-md bg-red-700 hover:bg-red-600 text-white px-3 py-2"
+                      aria-label={`Remove variant ${index + 1}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {variants.length === 0 && (
+                <p className="text-sm text-red-600">
+                  Add at least one variant or uncheck the variants option.
+                </p>
+              )}
+            </div>
+          )}
         </form>
         <div className="flex flex-wrap gap-6 w-auto justify-center mt-10 [&_button]:w-25 [&_button]:rounded-sm [&_button]:px-3 [&_button]:py-2 [&_button]:hover:cursor-pointer [&_button]:text-white [&_button]:transition [&_button]:ease-in-out [&_button]:duration-200">
           <button

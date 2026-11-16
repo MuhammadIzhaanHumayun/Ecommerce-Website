@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import ProductModal from "@/app/components/ProductModal";
+import { Plus } from "lucide-react";
 
 export default function Home() {
   const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
@@ -11,11 +13,30 @@ export default function Home() {
   const [selectedCategory, setSelectedcategory] = useState();
   const [isRetrying, setIsRetrying] = useState(false);
   const [retryCountdown, setRetryCountdown] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const addToCart = (product) => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const addToCart = (product, selectedVariant = null) => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    const existingItem = cart.find((item) => item.id === product.id);
+    const hasVariants = product.variants?.length > 0;
+
+    // A variant product must have a selected variant.
+    if (hasVariants && !selectedVariant) {
+      console.error("Please select a product variant.");
+      return;
+    }
+
+    const itemPrice = selectedVariant
+      ? Number(selectedVariant.price)
+      : Number(product.price);
+
+    const variantId = selectedVariant?.id ?? null;
+
+    // Match both product ID and variant ID.
+    const existingItem = cart.find(
+      (item) =>
+        item.id === product.id && (item.variantId ?? null) === variantId,
+    );
 
     let quantity = 1;
 
@@ -25,25 +46,29 @@ export default function Home() {
     } else {
       cart.push({
         id: product.id,
+        variantId,
+        variantName: selectedVariant?.name ?? null,
         name: product.name,
-        price: product.price,
+        price: itemPrice,
         image: product.image,
         quantity: 1,
       });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-
     window.dispatchEvent(new Event("cartUpdated"));
 
     const toastId = Date.now();
 
-    const newToast = {
-      id: toastId,
-      message: `${product.name} x ${quantity} added to cart`,
-    };
-
-    setToasts((prev) => [...prev, newToast]);
+    setToasts((prev) => [
+      ...prev,
+      {
+        id: toastId,
+        message: `${product.name}${
+          selectedVariant ? ` (${selectedVariant.name})` : ""
+        } x ${quantity} added to cart`,
+      },
+    ]);
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== toastId));
@@ -166,6 +191,14 @@ export default function Home() {
     ? products.filter((p) => p.category?.id === selectedCategory)
     : [];
 
+  const getDisplayPrice = (product) => {
+    if (product.variants?.length > 0) {
+      return Math.min(...product.variants.map((variant) => variant.price));
+    }
+
+    return product.price;
+  };
+
   return (
     <>
       <div className="w-full z-0 py-6 justify-items-center overflow-hidden">
@@ -244,20 +277,36 @@ export default function Home() {
                 <p className="my-2 px-3 h-1/10 text-gray-700">
                   {p.description}
                 </p>
-                <p className="my-2 font-bold text-xl mx-3">Rs. {p.price}</p>
-                <button
-                  onClick={() => {
-                    addToCart(p);
-                  }}
-                  className="py-2 mx-3 mt-2 mb-3 bg-btn-bg text-btn-text hover:bg-btn-bg/90 ease-in-out duration-200 rounded-full font-bold cursor-pointer"
-                >
-                  ADD TO CART
-                </button>
+
+                <div className="mt-auto flex items-center justify-between px-3 pb-3">
+                  <p className="font-bold text-xl">
+                    {p.variants?.length > 0 ? "From " : ""}
+                    Rs. {getDisplayPrice(p)}
+                  </p>
+
+                  <button
+                    onClick={() => setSelectedProduct(p)}
+                    aria-label={`View ${p.name} details`}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-btn-bg text-btn-text hover:bg-btn-bg/90 text-3xl font-bold transition-all duration-200 cursor-pointer"
+                  >
+                    <Plus />
+                  </button>
+                </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {selectedProduct && (
+        <ProductModal
+          key={selectedProduct.id}
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onAddToCart={addToCart}
+        />
+      )}
+
       <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm">
         {toasts.map((toast) => (
           <div

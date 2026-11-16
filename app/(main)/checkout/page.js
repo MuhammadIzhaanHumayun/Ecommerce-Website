@@ -108,7 +108,7 @@ export default function Checkout() {
                 <div className="flex flex-col gap-3">
                   {cart.map((item) => (
                     <div
-                      key={item.id}
+                      key={`${item.id}-${item.variantId ?? "default"}`}
                       className="flex gap-2 border border-gray-300 rounded-xl p-2"
                     >
                       <Image

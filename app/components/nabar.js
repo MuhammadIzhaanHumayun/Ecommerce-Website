@@ -248,7 +248,10 @@ export default function Navbar({ session }) {
               ) : (
                 <div className="flex flex-col gap-4">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 ">
+                    <div
+                      key={`${item.id}-${item.variantId ?? "default"}`}
+                      className="flex items-center gap-3"
+                    >
                       <Image
                         src={item.image}
                         alt={item.name}

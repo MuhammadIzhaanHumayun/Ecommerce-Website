@@ -31,4 +31,16 @@ model Product {
   price       Float
   categoryId  Int
   category    Category @relation(fields: [categoryId], references: [id])
+
+  variants    ProductVariant[]
+}
+
+model ProductVariant {
+  id        Int     @id @default(autoincrement())
+  name      String
+  price     Float
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, name])
 }
